@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="content-section">
+    <div class="container narrow">
+        <div class="section-head left">
+            <p class="section-badge">Department Access</p>
+            <h2>{{ t('admin_title') }}</h2>
+        </div>
+
+        <form class="gov-form login-card" method="post">
+            <label>
+                <span>{{ t('username') }}</span>
+                <input type="text" name="username" required>
+            </label>
+            <label>
+                <span>{{ t('password') }}</span>
+                <input type="password" name="password" required>
+            </label>
+            <button class="btn btn-primary" type="submit">Login as Admin</button>
+            <p class="login-note">Demo credentials: admin / admin123</p>
+        </form>
+    </div>
+</section>
+{% endblock %}

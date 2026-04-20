@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero">
+    <div class="container hero-grid">
+        <div>
+            <p class="section-badge">Agriculture Department e-Services</p>
+            <h2>{{ t('hero_title') }}</h2>
+            <p>{{ t('hero_text') }}</p>
+            <div class="hero-actions">
+                <a class="btn btn-primary" href="{{ url_for('register_farmer') }}">{{ t('hero_button') }}</a>
+                <a class="btn btn-secondary" href="{{ url_for('track_status') }}">{{ t('track_button') }}</a>
+            </div>
+        </div>
+        <div class="hero-panel">
+            <div class="seal-card">
+                <span class="seal-circle">AI</span>
+                <div>
+                    <h3>Farmer First Digital Welfare</h3>
+                    <p>Registration, scheme applications, approvals, and grievance tracking in a single secure portal.</p>
+                </div>
+            </div>
+            <div class="stats-strip">
+                <div><strong>24x7</strong><span>Online Access</span></div>
+                <div><strong>OCR</strong><span>Document Check</span></div>
+                <div><strong>2</strong><span>Languages</span></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="features-section">
+    <div class="container">
+        <div class="section-head">
+            <p class="section-badge">Citizen Services</p>
+            <h3>{{ t('why_title') }}</h3>
+        </div>
+        <div class="feature-grid">
+            <article class="feature-card">
+                <h4>Farmer Onboarding</h4>
+                <p>{{ t('register_card') }}</p>
+            </article>
+            <article class="feature-card">
+                <h4>Scheme Support</h4>
+                <p>{{ t('subsidy_card') }}</p>
+            </article>
+            <article class="feature-card">
+                <h4>Status and Records</h4>
+                <p>{{ t('status_card') }}</p>
+            </article>
+        </div>
+    </div>
+</section>
+
+<section class="content-section">
+    <div class="container">
+        <div class="mission-panel">
+            <div class="section-head left">
+                <p class="section-badge">Project Vision</p>
+                <h3>{{ t('ai_intro_title') }}</h3>
+            </div>
+            <p class="mission-text">{{ t('ai_intro_text') }}</p>
+        </div>
+    </div>
+</section>
+
+<section class="chatbot-section">
+    <div class="container chatbot-layout">
+        <div class="section-head left">
+            <p class="section-badge">AI Assistance</p>
+            <h3>{{ t('chatbot_title') }}</h3>
+            <p>{{ t('chatbot_hint') }}</p>
+        </div>
+        <div class="chatbot-box">
+            <div id="chatbotMessages" class="chatbot-messages">
+                <div class="bot-message">Welcome to AgriSmart AI. Ask me how to register, apply subsidy, or check status.</div>
+            </div>
+            <div class="chatbot-input-row">
+                <input id="chatbotInput" type="text" placeholder="How to apply subsidy?">
+                <button id="chatbotSend" class="btn btn-primary" type="button">Ask</button>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

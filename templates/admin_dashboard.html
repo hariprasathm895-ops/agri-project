@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="dashboard-shell">
+    <div class="container dashboard-layout">
+        <aside class="sidebar">
+            <h3>Admin Panel</h3>
+            <a href="#overview">Overview</a>
+            <a href="#farmers">Farmers</a>
+            <a href="#subsidies">Subsidies</a>
+            <a href="#insurance">Insurance</a>
+            <a href="#complaints">Complaints</a>
+            <a href="#analytics">Analytics</a>
+        </aside>
+
+        <div class="dashboard-main">
+            <section id="overview">
+                <div class="section-head left">
+                    <p class="section-badge">Monitoring</p>
+                    <h2>Admin Welfare Dashboard</h2>
+                </div>
+                <div class="card-grid four">
+                    <article class="metric-card"><span>Total Farmers</span><strong>{{ analytics.total_farmers }}</strong></article>
+                    <article class="metric-card"><span>Pending Applications</span><strong>{{ analytics.pending_farmers }}</strong></article>
+                    <article class="metric-card"><span>Approved Farmers</span><strong>{{ analytics.approved_farmers }}</strong></article>
+                    <article class="metric-card"><span>Complaints</span><strong>{{ analytics.complaints }}</strong></article>
+                </div>
+            </section>
+
+            <section id="farmers" class="panel-section">
+                <h3>Farmer Applications</h3>
+                <div class="farmer-detail-grid">
+                    {% for farmer in farmers %}
+                        <article class="farmer-detail-card">
+                            <div class="complaint-head">
+                                <div>
+                                    <strong>{{ farmer['name'] }}</strong>
+                                    <p class="detail-code">{{ farmer['farmer_id'] }}</p>
+                                </div>
+                                <span class="pill pill-{{ farmer['status']|lower }}">{{ farmer['status'] }}</span>
+                            </div>
+                            <div class="detail-grid">
+                                <p><strong>Phone:</strong> {{ farmer['phone'] }}</p>
+                                <p><strong>Aadhaar:</strong> {{ farmer['aadhaar'] }}</p>
+                                <p><strong>Age:</strong> {{ farmer['age'] }}</p>
+                                <p><strong>Land Area:</strong> {{ farmer['land_area'] }} acres</p>
+                                <p><strong>Patta Number:</strong> {{ farmer['patta_number'] or 'Not provided' }}</p>
+                                <p><strong>OCR Status:</strong> {{ farmer['ocr_status'] }}</p>
+                                <p class="full-line"><strong>Address:</strong> {{ farmer['address'] }}</p>
+                            </div>
+                            <div class="image-links">
+                                {% if farmer['aadhaar_photo'] %}<a target="_blank" href="{{ url_for('static', filename=farmer['aadhaar_photo']) }}">View Aadhaar</a>{% endif %}
+                                {% if farmer['land_photo'] %}<a target="_blank" href="{{ url_for('static', filename=farmer['land_photo']) }}">View Land</a>{% endif %}
+                                {% if farmer['patta_photo'] %}<a target="_blank" href="{{ url_for('static', filename=farmer['patta_photo']) }}">View Patta</a>{% endif %}
+                            </div>
+                            <form class="inline-form" method="post" action="{{ url_for('update_farmer_status', farmer_id=farmer['id']) }}">
+                                <button name="status" value="Approved" class="mini-btn success" type="submit">Approve</button>
+                                <button name="status" value="Rejected" class="mini-btn danger" type="submit">Reject</button>
+                            </form>
+                        </article>
+                    {% else %}
+                        <p>No farmer applications submitted yet.</p>
+                    {% endfor %}
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Farmer ID</th>
+                                <th>Name</th>
+                                <th>Phone</th>
+                                <th>Aadhaar</th>
+                                <th>Land</th>
+                                <th>Patta</th>
+                                <th>OCR</th>
+                                <th>Status</th>
+                                <th>Images</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for farmer in farmers %}
+                                <tr>
+                                    <td>{{ farmer['farmer_id'] }}</td>
+                                    <td>{{ farmer['name'] }}</td>
+                                    <td>{{ farmer['phone'] }}</td>
+                                    <td>{{ farmer['aadhaar'] }}</td>
+                                    <td>{{ farmer['land_area'] }} acres</td>
+                                    <td>{{ farmer['patta_number'] or '-' }}</td>
+                                    <td>{{ farmer['ocr_status'] }}</td>
+                                    <td><span class="pill pill-{{ farmer['status']|lower }}">{{ farmer['status'] }}</span></td>
+                                    <td class="image-links">
+                                        {% if farmer['aadhaar_photo'] %}<a target="_blank" href="{{ url_for('static', filename=farmer['aadhaar_photo']) }}">Aadhaar</a>{% endif %}
+                                        {% if farmer['land_photo'] %}<a target="_blank" href="{{ url_for('static', filename=farmer['land_photo']) }}">Land</a>{% endif %}
+                                        {% if farmer['patta_photo'] %}<a target="_blank" href="{{ url_for('static', filename=farmer['patta_photo']) }}">Patta</a>{% endif %}
+                                    </td>
+                                    <td>
+                                        <form class="inline-form" method="post" action="{{ url_for('update_farmer_status', farmer_id=farmer['id']) }}">
+                                            <button name="status" value="Approved" class="mini-btn success" type="submit">Approve</button>
+                                            <button name="status" value="Rejected" class="mini-btn danger" type="submit">Reject</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr><td colspan="10">No farmer applications submitted yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="subsidies" class="panel-section">
+                <h3>Subsidy Requests</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Farmer</th>
+                                <th>Scheme</th>
+                                <th>Amount</th>
+                                <th>Details</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in subsidies %}
+                                <tr>
+                                    <td>{{ item['farmer_name'] }}<br><small>{{ item['farmer_code'] }}</small></td>
+                                    <td>{{ item['scheme_name'] }}</td>
+                                    <td>{{ item['amount'] }}</td>
+                                    <td>{{ item['details'] }}</td>
+                                    <td><span class="pill pill-{{ item['status']|lower }}">{{ item['status'] }}</span></td>
+                                    <td>
+                                        <form class="inline-form" method="post" action="{{ url_for('update_subsidy_status', record_id=item['id']) }}">
+                                            <button name="status" value="Approved" class="mini-btn success" type="submit">Approve</button>
+                                            <button name="status" value="Rejected" class="mini-btn danger" type="submit">Reject</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr><td colspan="6">No subsidy requests yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="insurance" class="panel-section">
+                <h3>Insurance Requests</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Farmer</th>
+                                <th>Crop Type</th>
+                                <th>Season</th>
+                                <th>Land Details</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in insurance_items %}
+                                <tr>
+                                    <td>{{ item['farmer_name'] }}<br><small>{{ item['farmer_code'] }}</small></td>
+                                    <td>{{ item['crop_type'] }}</td>
+                                    <td>{{ item['season'] }}</td>
+                                    <td>{{ item['land_details'] }}</td>
+                                    <td><span class="pill pill-{{ item['status']|lower }}">{{ item['status'] }}</span></td>
+                                    <td>
+                                        <form class="inline-form" method="post" action="{{ url_for('update_insurance_status', record_id=item['id']) }}">
+                                            <button name="status" value="Approved" class="mini-btn success" type="submit">Approve</button>
+                                            <button name="status" value="Rejected" class="mini-btn danger" type="submit">Reject</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr><td colspan="6">No insurance requests yet.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="complaints" class="panel-section">
+                <h3>Complaints and Responses</h3>
+                <div class="table-wrap complaint-grid">
+                    {% for item in complaints %}
+                        <article class="complaint-card">
+                            <div class="complaint-head">
+                                <strong>{{ item['subject'] }}</strong>
+                                <span class="pill pill-{{ 'approved' if item['status'] == 'Resolved' else 'pending' }}">{{ item['status'] }}</span>
+                            </div>
+                            <p><strong>Farmer:</strong> {{ item['farmer_name'] }} ({{ item['farmer_code'] }})</p>
+                            <p><strong>Message:</strong> {{ item['message'] }}</p>
+                            {% if item['admin_response'] %}
+                                <p><strong>Current Response:</strong> {{ item['admin_response'] }}</p>
+                            {% endif %}
+                            <form method="post" action="{{ url_for('respond_complaint', record_id=item['id']) }}">
+                                <textarea name="response" rows="3" placeholder="Type department response" required>{{ item['admin_response'] or '' }}</textarea>
+                                <select name="status">
+                                    <option value="Resolved">Resolved</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Open">Open</option>
+                                </select>
+                                <button class="btn btn-primary" type="submit">Save Response</button>
+                            </form>
+                        </article>
+                    {% else %}
+                        <p>No complaints available.</p>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section id="analytics" class="panel-section">
+                <h3>Analytics Dashboard</h3>
+                <div class="chart-grid">
+                    <canvas id="farmersChart"></canvas>
+                    <canvas id="subsidyChart"></canvas>
+                    <canvas id="insuranceChart"></canvas>
+                    <canvas id="complaintsChart"></canvas>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    window.adminAnalytics = {{ analytics|tojson }};
+</script>
+{% endblock %}

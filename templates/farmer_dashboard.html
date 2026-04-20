@@ -1,0 +1,136 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="dashboard-shell">
+    <div class="container dashboard-layout">
+        <aside class="sidebar">
+            <h3>{{ t('welcome_farmer') }}</h3>
+            <p>{{ farmer['name'] }}</p>
+            <a href="#overview">Overview</a>
+            <a href="#subsidy-form">Apply Subsidy</a>
+            <a href="#insurance-form">Apply Insurance</a>
+            <a href="#complaint-form">Submit Complaint</a>
+            <a href="#history">{{ t('history') }}</a>
+        </aside>
+
+        <div class="dashboard-main">
+            <section id="overview">
+                <div class="section-head left">
+                    <p class="section-badge">Approved Farmer Access</p>
+                    <h2>{{ farmer['name'] }} Dashboard</h2>
+                </div>
+                <div class="card-grid four">
+                    <article class="metric-card"><span>Total Applications</span><strong>{{ subsidies|length + insurance_items|length }}</strong></article>
+                    <article class="metric-card"><span>Subsidy Status</span><strong>{{ subsidies[0]['status'] if subsidies else 'No Request' }}</strong></article>
+                    <article class="metric-card"><span>Insurance Status</span><strong>{{ insurance_items[0]['status'] if insurance_items else 'No Request' }}</strong></article>
+                    <article class="metric-card"><span>Complaints</span><strong>{{ complaints|length }}</strong></article>
+                </div>
+            </section>
+
+            <section id="subsidy-form" class="panel-section">
+                <h3>Apply for Subsidy</h3>
+                <form class="gov-form embedded-form" method="post" action="{{ url_for('apply_subsidy') }}">
+                    <div class="form-grid">
+                        <label>
+                            <span>Scheme Name</span>
+                            <input type="text" name="scheme_name" required>
+                        </label>
+                        <label>
+                            <span>Amount</span>
+                            <input type="text" name="amount" required>
+                        </label>
+                        <label class="full-width">
+                            <span>Details</span>
+                            <textarea name="details" rows="3" required></textarea>
+                        </label>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Submit Subsidy Application</button>
+                </form>
+            </section>
+
+            <section id="insurance-form" class="panel-section">
+                <h3>Apply for Insurance</h3>
+                <form class="gov-form embedded-form" method="post" action="{{ url_for('apply_insurance') }}">
+                    <div class="form-grid">
+                        <label>
+                            <span>Crop Type</span>
+                            <input type="text" name="crop_type" required>
+                        </label>
+                        <label>
+                            <span>Season</span>
+                            <input type="text" name="season" required>
+                        </label>
+                        <label class="full-width">
+                            <span>Land Details</span>
+                            <textarea name="land_details" rows="3" required></textarea>
+                        </label>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Submit Insurance Request</button>
+                </form>
+            </section>
+
+            <section id="complaint-form" class="panel-section">
+                <h3>Submit Complaint</h3>
+                <form class="gov-form embedded-form" method="post" action="{{ url_for('submit_complaint') }}">
+                    <div class="form-grid">
+                        <label>
+                            <span>Subject</span>
+                            <input type="text" name="subject" required>
+                        </label>
+                        <label class="full-width">
+                            <span>Message</span>
+                            <textarea name="message" rows="4" required></textarea>
+                        </label>
+                    </div>
+                    <button class="btn btn-primary" type="submit">Submit Complaint</button>
+                </form>
+            </section>
+
+            <section id="history" class="panel-section">
+                <h3>{{ t('history') }}</h3>
+                <div class="history-grid">
+                    <article class="history-panel">
+                        <h4>Subsidy History</h4>
+                        {% for item in subsidies %}
+                            <div class="history-item">
+                                <strong>{{ item['scheme_name'] }}</strong>
+                                <span>{{ item['amount'] }} - {{ item['status'] }}</span>
+                                <p>{{ item['details'] }}</p>
+                            </div>
+                        {% else %}
+                            <p>No subsidy history yet.</p>
+                        {% endfor %}
+                    </article>
+                    <article class="history-panel">
+                        <h4>Insurance History</h4>
+                        {% for item in insurance_items %}
+                            <div class="history-item">
+                                <strong>{{ item['crop_type'] }}</strong>
+                                <span>{{ item['season'] }} - {{ item['status'] }}</span>
+                                <p>{{ item['land_details'] }}</p>
+                            </div>
+                        {% else %}
+                            <p>No insurance history yet.</p>
+                        {% endfor %}
+                    </article>
+                    <article class="history-panel">
+                        <h4>Complaint History</h4>
+                        {% for item in complaints %}
+                            <div class="history-item">
+                                <strong>{{ item['subject'] }}</strong>
+                                <span>{{ item['status'] }}</span>
+                                <p>{{ item['message'] }}</p>
+                                {% if item['admin_response'] %}
+                                    <small>Admin Response: {{ item['admin_response'] }}</small>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <p>No complaints submitted yet.</p>
+                        {% endfor %}
+                    </article>
+                </div>
+            </section>
+        </div>
+    </div>
+</section>
+{% endblock %}

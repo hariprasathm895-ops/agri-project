@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="content-section">
+    <div class="container narrow">
+        <div class="section-head left">
+            <p class="section-badge">Application Lookup</p>
+            <h2>{{ t('status_title') }}</h2>
+        </div>
+
+        <form class="gov-form track-form" method="post">
+            <label class="full-width">
+                <span>{{ t('search_label') }}</span>
+                <input type="text" name="lookup" placeholder="9876543210 / 123412341234" required>
+            </label>
+            <button class="btn btn-primary" type="submit">{{ t('search') }}</button>
+        </form>
+
+        {% if farmer %}
+            <div class="status-card status-{{ farmer['status']|lower }}">
+                <div class="status-row">
+                    <div>
+                        <p class="mini-label">Farmer ID</p>
+                        <strong>{{ farmer['farmer_id'] }}</strong>
+                    </div>
+                    <div>
+                        <p class="mini-label">Applicant</p>
+                        <strong>{{ farmer['name'] }}</strong>
+                    </div>
+                    <div>
+                        <p class="mini-label">Current Status</p>
+                        <strong>{{ farmer['status'] }}</strong>
+                    </div>
+                </div>
+                <div class="status-row">
+                    <div>
+                        <p class="mini-label">OCR Verification</p>
+                        <strong>{{ farmer['ocr_status'] }}</strong>
+                    </div>
+                    <div>
+                        <p class="mini-label">Phone</p>
+                        <strong>{{ farmer['phone'] }}</strong>
+                    </div>
+                    <div>
+                        <p class="mini-label">Aadhaar</p>
+                        <strong>{{ farmer['aadhaar'] }}</strong>
+                    </div>
+                </div>
+
+                {% if farmer['status'] == 'Approved' %}
+                    <form method="post" action="{{ url_for('farmer_access') }}">
+                        <input type="hidden" name="farmer_id" value="{{ farmer['id'] }}">
+                        <button class="btn btn-primary" type="submit">Open Approved Dashboard</button>
+                    </form>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

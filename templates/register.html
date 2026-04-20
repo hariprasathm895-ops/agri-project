@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="content-section">
+    <div class="container narrow">
+        <div class="section-head left">
+            <p class="section-badge">Farmer Services</p>
+            <h2>{{ t('reg_title') }}</h2>
+        </div>
+
+        <form class="gov-form" method="post" enctype="multipart/form-data">
+            <div class="form-grid">
+                <label>
+                    <span>{{ t('name') }}</span>
+                    <input type="text" name="name" required>
+                </label>
+                <label>
+                    <span>{{ t('age') }}</span>
+                    <input type="number" name="age" min="18" max="120" required>
+                </label>
+                <label class="full-width">
+                    <span>{{ t('address') }}</span>
+                    <textarea name="address" rows="3" required></textarea>
+                </label>
+                <label>
+                    <span>{{ t('phone') }}</span>
+                    <input type="text" name="phone" maxlength="10" pattern="\d{10}" required>
+                </label>
+                <label>
+                    <span>{{ t('aadhaar') }}</span>
+                    <input type="text" name="aadhaar" maxlength="12" pattern="\d{12}" required>
+                </label>
+                <label>
+                    <span>{{ t('land_area') }}</span>
+                    <input type="number" step="0.01" name="land_area" required>
+                </label>
+                <label>
+                    <span>{{ t('patta_number') }}</span>
+                    <input type="text" name="patta_number" required>
+                </label>
+                <label>
+                    <span>{{ t('aadhaar_photo') }}</span>
+                    <input type="file" name="aadhaar_photo" accept=".png,.jpg,.jpeg,.webp" required>
+                </label>
+                <label>
+                    <span>{{ t('land_photo') }}</span>
+                    <input type="file" name="land_photo" accept=".png,.jpg,.jpeg,.webp" required>
+                </label>
+                <label class="full-width">
+                    <span>{{ t('patta_photo') }}</span>
+                    <input type="file" name="patta_photo" accept=".png,.jpg,.jpeg,.webp" required>
+                </label>
+            </div>
+            <button class="btn btn-primary" type="submit">{{ t('submit') }}</button>
+        </form>
+    </div>
+</section>
+{% endblock %}
