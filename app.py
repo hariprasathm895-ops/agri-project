@@ -483,7 +483,15 @@ def admin_dashboard():
     farmers = db.execute("SELECT * FROM farmers ORDER BY created_at DESC").fetchall()
     subsidies = db.execute(
         """
-        SELECT subsidies.*, farmers.name AS farmer_name, farmers.farmer_id AS farmer_code
+        SELECT
+            subsidies.*,
+            farmers.name AS farmer_name,
+            farmers.farmer_id AS farmer_code,
+            farmers.phone AS farmer_phone,
+            farmers.aadhaar AS farmer_aadhaar,
+            farmers.address AS farmer_address,
+            farmers.land_area AS farmer_land_area,
+            farmers.patta_number AS farmer_patta_number
         FROM subsidies
         JOIN farmers ON farmers.id = subsidies.farmer_id
         ORDER BY subsidies.created_at DESC
@@ -491,7 +499,15 @@ def admin_dashboard():
     ).fetchall()
     insurance_items = db.execute(
         """
-        SELECT insurance.*, farmers.name AS farmer_name, farmers.farmer_id AS farmer_code
+        SELECT
+            insurance.*,
+            farmers.name AS farmer_name,
+            farmers.farmer_id AS farmer_code,
+            farmers.phone AS farmer_phone,
+            farmers.aadhaar AS farmer_aadhaar,
+            farmers.address AS farmer_address,
+            farmers.land_area AS farmer_land_area,
+            farmers.patta_number AS farmer_patta_number
         FROM insurance
         JOIN farmers ON farmers.id = insurance.farmer_id
         ORDER BY insurance.created_at DESC
@@ -499,7 +515,15 @@ def admin_dashboard():
     ).fetchall()
     complaints = db.execute(
         """
-        SELECT complaints.*, farmers.name AS farmer_name, farmers.farmer_id AS farmer_code
+        SELECT
+            complaints.*,
+            farmers.name AS farmer_name,
+            farmers.farmer_id AS farmer_code,
+            farmers.phone AS farmer_phone,
+            farmers.aadhaar AS farmer_aadhaar,
+            farmers.address AS farmer_address,
+            farmers.land_area AS farmer_land_area,
+            farmers.patta_number AS farmer_patta_number
         FROM complaints
         JOIN farmers ON farmers.id = complaints.farmer_id
         ORDER BY complaints.created_at DESC
@@ -555,6 +579,31 @@ def update_farmer_status(farmer_id):
     db.execute("UPDATE farmers SET status = ? WHERE id = ?", (status, farmer_id))
     db.commit()
     flash(f"Farmer application marked as {status}.", "success")
+    return redirect(url_for("admin_dashboard"))
+
+
+@app.post("/admin/farmer/<int:farmer_id>/delete")
+@admin_required
+def delete_farmer(farmer_id):
+    db = get_db()
+    farmer = db.execute("SELECT * FROM farmers WHERE id = ?", (farmer_id,)).fetchone()
+    if not farmer:
+        flash("Farmer record not found.", "error")
+        return redirect(url_for("admin_dashboard"))
+    if farmer["status"] == "Pending":
+        flash("Pending farmers cannot be deleted. Approve or reject first.", "error")
+        return redirect(url_for("admin_dashboard"))
+
+    db.execute("DELETE FROM subsidies WHERE farmer_id = ?", (farmer_id,))
+    db.execute("DELETE FROM insurance WHERE farmer_id = ?", (farmer_id,))
+    db.execute("DELETE FROM complaints WHERE farmer_id = ?", (farmer_id,))
+    db.execute("DELETE FROM farmers WHERE id = ?", (farmer_id,))
+    db.commit()
+
+    if session.get("farmer_db_id") == farmer_id:
+        session.pop("farmer_db_id", None)
+
+    flash("Farmer record deleted successfully.", "success")
     return redirect(url_for("admin_dashboard"))
 
 
