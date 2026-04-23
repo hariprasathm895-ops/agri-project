@@ -53,10 +53,40 @@
                                 {% if farmer['land_photo'] %}<a target="_blank" href="{{ url_for('static', filename=farmer['land_photo']) }}">View Land</a>{% endif %}
                                 {% if farmer['patta_photo'] %}<a target="_blank" href="{{ url_for('static', filename=farmer['patta_photo']) }}">View Patta</a>{% endif %}
                             </div>
-                            <form class="inline-form" method="post" action="{{ url_for('update_farmer_status', farmer_id=farmer['id']) }}">
-                                <button name="status" value="Approved" class="mini-btn success" type="submit">Approve</button>
-                                <button name="status" value="Rejected" class="mini-btn danger" type="submit">Reject</button>
-                            </form>
+                            <div class="preview-grid">
+                                {% if farmer['aadhaar_photo'] %}
+                                    <a class="preview-card" target="_blank" href="{{ url_for('static', filename=farmer['aadhaar_photo']) }}">
+                                        <span>Aadhaar Preview</span>
+                                        <img src="{{ url_for('static', filename=farmer['aadhaar_photo']) }}" alt="Aadhaar preview">
+                                    </a>
+                                {% endif %}
+                                {% if farmer['land_photo'] %}
+                                    <a class="preview-card" target="_blank" href="{{ url_for('static', filename=farmer['land_photo']) }}">
+                                        <span>Land Preview</span>
+                                        <img src="{{ url_for('static', filename=farmer['land_photo']) }}" alt="Land preview">
+                                    </a>
+                                {% endif %}
+                                {% if farmer['patta_photo'] %}
+                                    <a class="preview-card" target="_blank" href="{{ url_for('static', filename=farmer['patta_photo']) }}">
+                                        <span>Patta Preview</span>
+                                        <img src="{{ url_for('static', filename=farmer['patta_photo']) }}" alt="Patta preview">
+                                    </a>
+                                {% endif %}
+                            </div>
+                            {% if farmer['status'] == 'Pending' %}
+                                <form class="inline-form" method="post" action="{{ url_for('update_farmer_status', farmer_id=farmer['id']) }}">
+                                    <button name="status" value="Approved" class="mini-btn success" type="submit">Approve</button>
+                                    <button name="status" value="Rejected" class="mini-btn danger" type="submit">Reject</button>
+                                </form>
+                            {% else %}
+                                <p class="status-note">This farmer has already been {{ farmer['status']|lower }}.</p>
+                                <form class="inline-form" method="post" action="{{ url_for('update_farmer_status', farmer_id=farmer['id']) }}">
+                                    <button name="status" value="Pending" class="mini-btn neutral" type="submit">Move Back to Pending</button>
+                                </form>
+                                <form class="inline-form" method="post" action="{{ url_for('delete_farmer', farmer_id=farmer['id']) }}" onsubmit="return confirm('Delete this farmer and all linked records?');">
+                                    <button class="mini-btn danger-outline" type="submit">Delete Farmer</button>
+                                </form>
+                            {% endif %}
                         </article>
                     {% else %}
                         <p>No farmer applications submitted yet.</p>
@@ -95,10 +125,21 @@
                                         {% if farmer['patta_photo'] %}<a target="_blank" href="{{ url_for('static', filename=farmer['patta_photo']) }}">Patta</a>{% endif %}
                                     </td>
                                     <td>
-                                        <form class="inline-form" method="post" action="{{ url_for('update_farmer_status', farmer_id=farmer['id']) }}">
-                                            <button name="status" value="Approved" class="mini-btn success" type="submit">Approve</button>
-                                            <button name="status" value="Rejected" class="mini-btn danger" type="submit">Reject</button>
-                                        </form>
+                                        {% if farmer['status'] == 'Pending' %}
+                                            <form class="inline-form" method="post" action="{{ url_for('update_farmer_status', farmer_id=farmer['id']) }}">
+                                                <button name="status" value="Approved" class="mini-btn success" type="submit">Approve</button>
+                                                <button name="status" value="Rejected" class="mini-btn danger" type="submit">Reject</button>
+                                            </form>
+                                        {% else %}
+                                            <div class="table-action-stack">
+                                                <form class="inline-form" method="post" action="{{ url_for('update_farmer_status', farmer_id=farmer['id']) }}">
+                                                    <button name="status" value="Pending" class="mini-btn neutral" type="submit">Pending</button>
+                                                </form>
+                                                <form class="inline-form" method="post" action="{{ url_for('delete_farmer', farmer_id=farmer['id']) }}" onsubmit="return confirm('Delete this farmer and all linked records?');">
+                                                    <button class="mini-btn danger-outline" type="submit">Delete</button>
+                                                </form>
+                                            </div>
+                                        {% endif %}
                                     </td>
                                 </tr>
                             {% else %}
@@ -126,10 +167,21 @@
                         <tbody>
                             {% for item in subsidies %}
                                 <tr>
-                                    <td>{{ item['farmer_name'] }}<br><small>{{ item['farmer_code'] }}</small></td>
+                                    <td>
+                                        {{ item['farmer_name'] }}<br>
+                                        <small>{{ item['farmer_code'] }}</small><br>
+                                        <small>{{ item['farmer_phone'] }} | {{ item['farmer_aadhaar'] }}</small>
+                                    </td>
                                     <td>{{ item['scheme_name'] }}</td>
                                     <td>{{ item['amount'] }}</td>
-                                    <td>{{ item['details'] }}</td>
+                                    <td>
+                                        {{ item['details'] }}
+                                        <div class="request-meta">
+                                            <small>Land: {{ item['farmer_land_area'] }} acres</small>
+                                            <small>Patta: {{ item['farmer_patta_number'] or '-' }}</small>
+                                            <small>Address: {{ item['farmer_address'] }}</small>
+                                        </div>
+                                    </td>
                                     <td><span class="pill pill-{{ item['status']|lower }}">{{ item['status'] }}</span></td>
                                     <td>
                                         <form class="inline-form" method="post" action="{{ url_for('update_subsidy_status', record_id=item['id']) }}">
@@ -163,10 +215,21 @@
                         <tbody>
                             {% for item in insurance_items %}
                                 <tr>
-                                    <td>{{ item['farmer_name'] }}<br><small>{{ item['farmer_code'] }}</small></td>
+                                    <td>
+                                        {{ item['farmer_name'] }}<br>
+                                        <small>{{ item['farmer_code'] }}</small><br>
+                                        <small>{{ item['farmer_phone'] }} | {{ item['farmer_aadhaar'] }}</small>
+                                    </td>
                                     <td>{{ item['crop_type'] }}</td>
                                     <td>{{ item['season'] }}</td>
-                                    <td>{{ item['land_details'] }}</td>
+                                    <td>
+                                        {{ item['land_details'] }}
+                                        <div class="request-meta">
+                                            <small>Land: {{ item['farmer_land_area'] }} acres</small>
+                                            <small>Patta: {{ item['farmer_patta_number'] or '-' }}</small>
+                                            <small>Address: {{ item['farmer_address'] }}</small>
+                                        </div>
+                                    </td>
                                     <td><span class="pill pill-{{ item['status']|lower }}">{{ item['status'] }}</span></td>
                                     <td>
                                         <form class="inline-form" method="post" action="{{ url_for('update_insurance_status', record_id=item['id']) }}">
@@ -193,6 +256,9 @@
                                 <span class="pill pill-{{ 'approved' if item['status'] == 'Resolved' else 'pending' }}">{{ item['status'] }}</span>
                             </div>
                             <p><strong>Farmer:</strong> {{ item['farmer_name'] }} ({{ item['farmer_code'] }})</p>
+                            <p><strong>Phone / Aadhaar:</strong> {{ item['farmer_phone'] }} / {{ item['farmer_aadhaar'] }}</p>
+                            <p><strong>Land / Patta:</strong> {{ item['farmer_land_area'] }} acres / {{ item['farmer_patta_number'] or '-' }}</p>
+                            <p><strong>Address:</strong> {{ item['farmer_address'] }}</p>
                             <p><strong>Message:</strong> {{ item['message'] }}</p>
                             {% if item['admin_response'] %}
                                 <p><strong>Current Response:</strong> {{ item['admin_response'] }}</p>
