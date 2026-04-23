@@ -120,9 +120,6 @@
                                 <strong>{{ item['subject'] }}</strong>
                                 <span>{{ item['status'] }}</span>
                                 <p>{{ item['message'] }}</p>
-                                {% if item['admin_response'] %}
-                                    <small>Admin Response: {{ item['admin_response'] }}</small>
-                                {% endif %}
                             </div>
                         {% else %}
                             <p>No complaints submitted yet.</p>
