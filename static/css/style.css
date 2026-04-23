@@ -290,7 +290,8 @@ small {
 .card-grid.four,
 .chart-grid,
 .history-grid,
-.farmer-detail-grid {
+.farmer-detail-grid,
+.request-card-grid {
     display: grid;
     gap: 20px;
 }
@@ -574,8 +575,19 @@ th {
     margin-bottom: 22px;
 }
 
+.request-card-grid {
+    grid-template-columns: repeat(2, 1fr);
+}
+
 .farmer-detail-card {
     padding: 20px;
+    background: #fdfefe;
+    border: 1px solid var(--border);
+    border-radius: 20px;
+}
+
+.request-card {
+    padding: 22px;
     background: #fdfefe;
     border: 1px solid var(--border);
     border-radius: 20px;
@@ -704,7 +716,8 @@ th {
     .chart-grid,
     .history-grid,
     .complaint-grid,
-    .preview-grid {
+    .preview-grid,
+    .request-card-grid {
         grid-template-columns: 1fr;
     }
 
